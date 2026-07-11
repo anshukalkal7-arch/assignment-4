@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Restaurant Menu</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+        background:#f4f4f4;
+        padding:30px;
+    }
+
+    h1{
+        text-align:center;
+        margin-bottom:25px;
+        color:#333;
+    }
+
+    /* Filter Buttons */
+    .filter-buttons{
+        display:flex;
+        justify-content:center;
+        flex-wrap:wrap;
+        gap:12px;
+        margin-bottom:30px;
+    }
+
+    .filter-btn{
+        padding:10px 20px;
+        border:none;
+        border-radius:30px;
+        cursor:pointer;
+        background:#ddd;
+        font-size:16px;
+        transition:.3s;
+    }
+
+    .filter-btn:hover{
+        background:#bbb;
+    }
+
+    .filter-btn.active{
+        background:#ff6b35;
+        color:white;
+    }
+
+    /* Grid */
+    .menu-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+        gap:20px;
+    }
+
+    .menu-card{
+        background:white;
+        padding:20px;
+        border-radius:12px;
+        box-shadow:0 5px 12px rgba(0,0,0,.1);
+        transition:.3s;
+    }
+
+    .menu-card:hover{
+        transform:translateY(-5px);
+    }
+
+    .emoji{
+        font-size:50px;
+        text-align:center;
+        margin-bottom:10px;
+    }
+
+    .menu-card h3{
+        color:#222;
+        margin-bottom:8px;
+    }
+
+    .price{
+        color:#ff6b35;
+        font-weight:bold;
+        margin:10px 0;
+        font-size:18px;
+    }
+
+    .category{
+        display:inline-block;
+        background:#ffe6dd;
+        color:#ff6b35;
+        padding:4px 10px;
+        border-radius:20px;
+        margin-top:10px;
+        font-size:14px;
+    }
+</style>
+
+</head>
+<body>
+
+<h1>🍽 Restaurant Menu</h1>
+
+<div class="filter-buttons" id="filterButtons"></div>
+
+<div class="menu-grid" id="menuGrid"></div>
+
+<script>
+
+// =========================
+// MENU ITEMS ARRAY
+// (Normally place this at the top of script.js)
+// =========================
+
+const menuItems = [
+{
+id:1,
+name:"Garlic Bread",
+price:"₹120",
+category:"Starters",
+description:"Crispy garlic bread with herbs.",
+emoji:"🥖"
+},
+{
+id:2,
+name:"Spring Rolls",
+price:"₹160",
+category:"Starters",
+description:"Crunchy vegetable spring rolls.",
+emoji:"🥟"
+},
+{
+id:3,
+name:"Tomato Soup",
+price:"₹140",
+category:"Starters",
+description:"Creamy tomato soup.",
+emoji:"🍅"
+},
+{
+id:4,
+name:"Veg Burger",
+price:"₹220",
+category:"Main Course",
+description:"Loaded veggie burger.",
+emoji:"🍔"
+},
+{
+id:5,
+name:"Margherita Pizza",
+price:"₹350",
+category:"Main Course",
+description:"Cheesy Italian pizza.",
+emoji:"🍕"
+},
+{
+id:6,
+name:"Pasta Alfredo",
+price:"₹290",
+category:"Main Course",
+description:"Creamy white sauce pasta.",
+emoji:"🍝"
+},
+{
+id:7,
+name:"Paneer Biryani",
+price:"₹320",
+category:"Main Course",
+description:"Flavorful biryani with paneer.",
+emoji:"🍛"
+},
+{
+id:8,
+name:"Chocolate Cake",
+price:"₹180",
+category:"Desserts",
+description:"Rich chocolate cake.",
+emoji:"🍰"
+},
+{
+id:9,
+name:"Ice Cream",
+price:"₹120",
+category:"Desserts",
+description:"Vanilla ice cream scoop.",
+emoji:"🍨"
+},
+{
+id:10,
+name:"Gulab Jamun",
+price:"₹100",
+category:"Desserts",
+description:"Soft Indian sweet.",
+emoji:"🍮"
+},
+{
+id:11,
+name:"Cold Coffee",
+price:"₹160",
+category:"Drinks",
+description:"Refreshing cold coffee.",
+emoji:"🥤"
+},
+{
+id:12,
+name:"Fresh Orange Juice",
+price:"₹140",
+category:"Drinks",
+description:"Freshly squeezed juice.",
+emoji:"🍊"
+}
+];
+
+// =========================
+// DOM Manipulation
+// =========================
+
+const menuGrid = document.getElementById("menuGrid");
+const filterButtons = document.getElementById("filterButtons");
+
+// Render Cards
+
+function renderMenu(){
+
+menuItems.forEach(item=>{
+
+const card=document.createElement("div");
+
+card.className="menu-card";
+
+card.setAttribute("data-category",item.category);
+
+card.innerHTML=`
+<div class="emoji">${item.emoji}</div>
+<h3>${item.name}</h3>
+<p>${item.description}</p>
+<div class="price">${item.price}</div>
+<span class="category">${item.category}</span>
+`;
+
+menuGrid.appendChild(card);
+
+});
+
+}
+
+// Create Filter Buttons
+
+function createButtons(){
+
+const categories=["All",...new Set(menuItems.map(item=>item.category))];
+
+categories.forEach(category=>{
+
+const btn=document.createElement("button");
+
+btn.textContent=category;
+
+btn.className="filter-btn";
+
+if(category==="All"){
+btn.classList.add("active");
+}
+
+btn.addEventListener("click",()=>{
+
+// Active button
+
+document.querySelectorAll(".filter-btn").forEach(button=>{
+button.classList.remove("active");
+});
+
+btn.classList.add("active");
+
+// Filter cards
+
+document.querySelectorAll(".menu-card").forEach(card=>{
+
+const cardCategory=card.getAttribute("data-category");
+
+if(category==="All" || cardCategory===category){
+card.style.display="block";
+}else{
+card.style.display="none";
+}
+
+});
+
+});
+
+filterButtons.appendChild(btn);
+
+});
+
+}
+
+renderMenu();
+createButtons();
+
+</script>
+
+</body>
+</html>
